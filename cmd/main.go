@@ -1,0 +1,40 @@
+package main
+
+import (
+	"fmt"
+	"net"
+	"os"
+
+	"github.com/bachletuankhai/codecrafters-kafka-go/internal/response"
+)
+
+func handleConnection(conn net.Conn) {
+	defer conn.Close()
+	res := response.NewResponse(conn)
+	err := res.Write(nil, nil)
+	if err != nil {
+		fmt.Println("Error writing response: ", err.Error())
+	}
+}
+
+func main() {
+	// You can use print statements as follows for debugging, they'll be visible when running tests.
+	fmt.Println("Logs from your program will appear here!")
+
+	// TODO: Uncomment the code below to pass the first stage
+	//
+	l, err := net.Listen("tcp", "0.0.0.0:9092")
+	if err != nil {
+		fmt.Println("Failed to bind to port 9092")
+		os.Exit(1)
+	}
+	for {
+		conn, err := l.Accept()
+		if err != nil {
+			fmt.Println("Error accepting connection: ", err.Error())
+			conn.Close()
+			os.Exit(1)
+		}
+		go handleConnection(conn)
+	}
+}
